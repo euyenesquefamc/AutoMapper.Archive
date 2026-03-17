@@ -1,4 +1,5 @@
 ﻿namespace AutoMapper.UnitTests.Bug;
+
 public class MultiThreadingIssues
 {
     public class Type1
@@ -43,12 +44,12 @@ public class MultiThreadingIssues
     {
         const int threadCount = 13;
 
-        for(int i = 0; i < threadCount; i++)
+        for (int i = 0; i < threadCount; i++)
         {
             Task.Factory.StartNew(doMapping).ContinueWith(
                 a =>
                 {
-                    if(Interlocked.Increment(ref _done) == threadCount)
+                    if (Interlocked.Increment(ref _done) == threadCount)
                     {
                         _allDone.Set();
                     }
@@ -77,7 +78,7 @@ public class MultiThreadingIssues
 
         int n = _random.Next(0, 4);
 
-        if(n == 0)
+        if (n == 0)
         {
             return new Type1
             {
@@ -87,7 +88,7 @@ public class MultiThreadingIssues
                 MiddleName = @"G"
             };
         }
-        if(n == 1)
+        if (n == 1)
         {
             return new Type1Point1()
             {
@@ -95,7 +96,7 @@ public class MultiThreadingIssues
             };
 
         }
-        if(n == 2)
+        if (n == 2)
         {
             return new Type1Point2()
             {
@@ -104,7 +105,7 @@ public class MultiThreadingIssues
             };
 
         }
-        if(n == 3)
+        if (n == 3)
         {
             return new Type1Point3()
             {
@@ -641,9 +642,8 @@ public class ResolveWithGenericMap
         };
         var tasks =
             types
-            .Concat(types.Select(t => t.Reverse().ToArray()))
-            .Select(t=>(SourceType: sourceType.MakeGenericType(t[0]), DestinationType: destinationType.MakeGenericType(t[1])))
-            .ToArray()
+            .Concat(types.Select(t => Enumerable.Reverse(t).ToArray()))
+            .Select(t => (SourceType: sourceType.MakeGenericType(t[0]), DestinationType: destinationType.MakeGenericType(t[1])))
             .Select(s => Task.Factory.StartNew(() => c.ResolveTypeMap(s.SourceType, s.DestinationType)))
             .ToArray();
         await Task.WhenAll(tasks);
@@ -1173,9 +1173,8 @@ public class ResolveGenericTypeMapThreadingIssues
         };
         var tasks =
             types
-            .Concat(types.Select(t => t.Reverse().ToArray()))
-            .Select(t=>(SourceType: sourceType.MakeGenericType(t[0]), DestinationType: destinationType.MakeGenericType(t[1])))
-            .ToArray()
+            .Concat(types.Select(t => Enumerable.Reverse(t).ToArray()))
+            .Select(t => (SourceType: sourceType.MakeGenericType(t[0]), DestinationType: destinationType.MakeGenericType(t[1])))
             .Select(s => Task.Factory.StartNew(() => mapper.Map(null, s.SourceType, s.DestinationType)))
             .ToArray();
         await Task.WhenAll(tasks);
